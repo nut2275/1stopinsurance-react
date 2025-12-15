@@ -14,12 +14,18 @@
     "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
+<<<<<<< HEAD
     "jwt-decode": "^4.0.0",
+=======
+>>>>>>> 91b1a25cae140de39b0345b88fce36bfe8c72c9c
     "lucide-react": "^0.561.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1",
+<<<<<<< HEAD
     "swr": "^2.3.7",
+=======
+>>>>>>> 91b1a25cae140de39b0345b88fce36bfe8c72c9c
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
