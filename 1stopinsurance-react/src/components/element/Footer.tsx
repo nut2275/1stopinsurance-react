@@ -1,5 +1,5 @@
 import React from 'react'
-import Link from "next/link";
+import { Link } from 'react-router-dom' // 1. เปลี่ยน import
 
 function Footer() {
   return (
@@ -39,13 +39,11 @@ function Footer() {
 
         {/* คอลัมน์ 4: Link */}
         <div>
-          {/* ปรับปรุงเล็กน้อย: 
-            ย้าย hover:underline มาไว้ที่ Link (แท็ก a) โดยตรง
-            และเปลี่ยน <p> เป็น <span> เพื่อความถูกต้องทาง semantic
-            (เพราะ <p> ไม่ควรอยู่ใน <p> แต่ Link จะ render เป็น <a>)
+          {/* Next.js ใช้ <Link href="..."> 
+             React Router ใช้ <Link to="..."> 
           */}
           <Link 
-            href="/agent/login" 
+            to="/agent/login" 
             className="hover:underline"
           >
             สนใจเป็นตัวแทนจำหน่ายประกัน คลิก

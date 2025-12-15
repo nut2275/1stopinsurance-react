@@ -1,14 +1,13 @@
-import React from 'react'; // Import React for JSX
-import Link from 'next/link';
-import Menu from '@/components/element/Menu';
-import Image from 'next/image';
+import React from 'react';
+import { Link } from 'react-router-dom';
+// import Menu from '@/components/element/Menu'; // ❌ ไม่ต้อง import แล้ว เพราะจะไปอยู่ใน Layout
 
 export default function MainPage() {
   return (
     <div className="flex flex-col min-h-screen font-sans text-gray-800 bg-gray-50">
 
-      {/* Header */}
-      <Menu />
+      {/* Header: ❌ ลบออก เพราะ Layout จะจัดการให้ */}
+      {/* <Menu /> */}
 
       {/* Main content */}
       <main className="flex-grow">
@@ -16,12 +15,11 @@ export default function MainPage() {
         <section className="bg-gradient-to-br from-blue-100 to-blue-200 py-12">
           <div className="max-w-6xl mx-auto bg-white/50 backdrop-blur-sm rounded-2xl p-8 flex flex-col md:flex-row items-center gap-10 shadow-lg border border-white/30">
             <div className="relative w-full md:w-96 h-60 md:h-auto md:aspect-square rounded-lg shadow-md overflow-hidden">
-               <Image
+                {/* เปลี่ยนเป็น <img> ธรรมดา */}
+               <img
                  src="/fotos/Home1.png"
                  alt="รถยนต์ที่ได้รับการคุ้มครอง"
                  className="w-full h-full object-cover"
-                 width={384}
-                 height={384}
                />
             </div>
 
@@ -38,7 +36,8 @@ export default function MainPage() {
                 <p className="text-xl"><span className="text-blue-800 font-bold">ผ่อน 0%</span> นาน 10 เดือน</p>
               </div>
 
-              <Link href="customer/car-insurance/car-Insurance-form"
+              {/* เปลี่ยน href เป็น to */}
+              <Link to="/customer/car-insurance/car-Insurance-form"
                  className="inline-block mt-8 bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-1">
                  เช็คเบี้ยประกันรถยนต์ →
               </Link>
@@ -54,12 +53,13 @@ export default function MainPage() {
             1StopInsurance มีแผนประกันรถยนต์ให้คุณเลือกเปรียบเทียบจากบริษัทชั้นนำ
           </p>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-6 mt-10">
-            <Image  src="/fotos/Insur1.png" alt="Partner 1" width={60} height={60} />
-            <Image  src="/fotos/Insur2.png" alt="Partner 2" width={60} height={60} />
-            <Image  src="/fotos/Insur3.png" alt="Partner 3" width={60} height={60} />
-            <Image  src="/fotos/Insur4.png" alt="Partner 4" width={60} height={60} />
-            <Image  src="/fotos/Insur5.png" alt="Partner 5" width={60} height={60} />
-            <Image  src="/fotos/Insur6.png" alt="Partner 6" width={60} height={60} />
+            {/* เปลี่ยน Image เป็น img และกำหนดขนาดด้วย class หรือ attribute */}
+            <img src="/fotos/Insur1.png" alt="Partner 1" width="60" height="60" className="object-contain" />
+            <img src="/fotos/Insur2.png" alt="Partner 2" width="60" height="60" className="object-contain" />
+            <img src="/fotos/Insur3.png" alt="Partner 3" width="60" height="60" className="object-contain" />
+            <img src="/fotos/Insur4.png" alt="Partner 4" width="60" height="60" className="object-contain" />
+            <img src="/fotos/Insur5.png" alt="Partner 5" width="60" height="60" className="object-contain" />
+            <img src="/fotos/Insur6.png" alt="Partner 6" width="60" height="60" className="object-contain" />
           </div>
         </section>
       </main>
@@ -67,5 +67,3 @@ export default function MainPage() {
     </div>
   );
 }
-
-
