@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo, FormEvent } from 'react';
-// แก้ไข: นำเข้า useNavigate จาก react-router-dom แทน next/navigation
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DriveEta, CalendarToday, Build, CheckCircle } from '@mui/icons-material';
 import MenuLogined from '../../components/element/MenuLogined';
+// ✅ นำเข้า api จาก services
+import api from '../../services/api';
 
 // ------------------- Type Definitions -------------------
 interface CarModels {
@@ -14,7 +15,6 @@ interface CarData {
 }
 
 // ------------------- Mock Car Data -------------------
-// ข้อมูลรถยนต์ถูกเก็บไว้ตามเดิม
 const carData: CarData = {
     "Toyota": {
         "Corolla Altis": ["1.6 G", "1.8 Hybrid", "GR Sport"],
@@ -26,7 +26,7 @@ const carData: CarData = {
         "Camry": ["2.0 G", "2.5 Hybrid"],
         "Vios": ["E", "G", "S"],
         "Avanza / Veloz": ["1.5 G", "Veloz Premium"],
-        "Inn o va / Innova": ["V", "Hybrid"],
+        "Innova / Innova": ["V", "Hybrid"],
         "C-HR": ["Entry", "High"],
         "Alphard / Vellfire": ["Executive Lounge", "Hybrid"]
     },
@@ -161,12 +161,7 @@ const carData: CarData = {
     }
 };
 
-
-// ------------------- Component -------------------
-
-// ไม่จำเป็นต้องมี "use client" ใน Pure React
 export default function CarInsuranceForm() {
-    // แก้ไข: ใช้ useNavigate() แทน useRouter()
     const navigate = useNavigate();
 
     const [selectedType, setSelectedType] = useState<string>('ชั้น 1');
@@ -176,7 +171,6 @@ export default function CarInsuranceForm() {
     const [submodel, setSubmodel] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    // 1. Memoized List of Years
     const yearOptions = useMemo(() => {
         const currentYear = new Date().getFullYear();
         const years = [];
@@ -186,7 +180,6 @@ export default function CarInsuranceForm() {
         return years;
     }, []);
 
-    // 2. Logic สำหรับรีเซ็ตค่า เมื่อ Dropdown ก่อนหน้าเปลี่ยน
     useEffect(() => {
         if (year) {
             setBrand('');
@@ -208,19 +201,17 @@ export default function CarInsuranceForm() {
         }
     }, [model]);
 
-
-    // 3. Handle Submit
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
         if (!year || !brand || !model || !submodel) {
-            console.error("กรุณากรอกข้อมูลรถยนต์ให้ครบถ้วนทุกช่อง"); 
+            alert("กรุณากรอกข้อมูลรถยนต์ให้ครบถ้วนทุกช่อง"); 
             return;
         }
 
         setIsLoading(true);
 
-        const body = {
+        const params = {
             year: year,
             carBrand: brand,
             model: model,
@@ -229,30 +220,27 @@ export default function CarInsuranceForm() {
         };
 
         try {
-            localStorage.setItem("searchCriteria", JSON.stringify(body));
+            // บันทึกเงื่อนไขการค้นหาลง LocalStorage
+            localStorage.setItem("searchCriteria", JSON.stringify(params));
             
-            // การดึงข้อมูล (Fetch API) ยังคงใช้ fetch() มาตรฐาน
-            const query = new URLSearchParams(body).toString();
-            const res = await fetch(`http://localhost:5000/api/plans?${query}`);
-            const data = await res.json();
-            localStorage.setItem("recommendedPlans", JSON.stringify(data));
+            // ✅ แก้ไข: ใช้ api.get() แทน fetch() 
+            // Axios จะจัดการต่อ query string ให้เมื่อใส่เป็น object ใน params
+            const res = await api.get('/api/plans', { params });
             
-            // แก้ไข: เปลี่ยน router.push("/path") เป็น navigate("/path")
+            // เก็บข้อมูลแผนประกันที่ได้จาก Backend
+            localStorage.setItem("recommendedPlans", JSON.stringify(res.data));
+            
             navigate("/customer/car-insurance/insurance");
 
         } catch (err) {
             console.error("Error fetching plans:", err);
             localStorage.setItem("recommendedPlans", JSON.stringify([]));
-            // แก้ไข: ใช้ navigate() เมื่อเกิด error ด้วย
             navigate("/customer/car-insurance/insurance");
         } finally {
             setIsLoading(false);
         }
     };
 
-
-    // ------------------- UI Rendering -------------------
-    
     const submodelList = brand && model ? carData[brand]?.[model] : [];
 
     return (

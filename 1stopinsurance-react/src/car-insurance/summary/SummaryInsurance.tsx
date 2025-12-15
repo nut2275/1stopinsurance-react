@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react";
-// แก้ไข: นำเข้า useSearchParams, useNavigate จาก react-router-dom แทน next/navigation
+import { useState, useEffect } from "react"; // ✅ ลบ React ออก
 import { useSearchParams, useNavigate } from "react-router-dom"; 
-// แก้ไข: ลบการนำเข้า Next.js Image
-// import Image from "next/image"; 
-// ⚠️ ต้องมั่นใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว
 import MenuLogined from "../../components/element/MenuLogined"; 
 
 interface InsurancePlan {
@@ -24,18 +20,11 @@ interface InsurancePlan {
     firstLossCoverage: number;
 }
 
-// ลบ 'use client'
 export default function SummaryPage() {
-    // แก้ไข: ใช้ useSearchParams() และ useNavigate()
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    
-    // ดึงค่า "id" จาก URL Query String
-    // Note: useSearchParams() ใน react-router-dom คืนค่าเป็น URLSearchParams
     const planId = searchParams.get("id"); 
 
-    const [selectedPlan, setSelectedPlan] = useState<InsurancePlan | null>(null);
-    const [loading, setLoading] = useState(true);
     const [agentCode, setAgentCode] = useState("");
 
     const getBrandLogo = (brandName: string) => {
@@ -45,26 +34,23 @@ export default function SummaryPage() {
         if (name.includes("กรุงเทพ")) return "/fotos/Insur6.png";
         if (name.includes("เมืองไทย")) return "/fotos/Insur2.png";
         if (name.includes("ธนชาต")) return "/fotos/Insur3.png";
-        if (name.includes("ทิพย")) return "/fotos/Insur1.png";
         return "/fotos/Insur1.png";
     };
 
-    useEffect(() => {
-        if (!planId) {
-            setLoading(false);
-            return;
-        }
+    // ✅ แก้ไข 1: ใช้ Lazy Initialization เพื่อหาข้อมูลทันที เลี่ยง Error set-state-in-effect
+    const [selectedPlan] = useState<InsurancePlan | null>(() => {
+        if (!planId) return null;
+        
         const storedData = localStorage.getItem("recommendedPlans");
         if (storedData) {
             const allPlans = JSON.parse(storedData);
             const foundRaw = allPlans.find((p: any) => String(p._id || p.id) === String(planId));
 
             if (foundRaw) {
-                const mappedPlan: InsurancePlan = {
+                return {
                     id: foundRaw._id || foundRaw.id,
                     company: foundRaw.insuranceBrand || foundRaw.company || "ไม่ระบุ",
-                    // ใช้ getBrandLogo เพื่อให้ได้ logoSrc
-                    logoSrc: foundRaw.img || foundRaw.logoSrc || getBrandLogo(foundRaw.insuranceBrand),
+                    logoSrc: foundRaw.img || foundRaw.logoSrc || getBrandLogo(foundRaw.insuranceBrand || foundRaw.company),
                     level: foundRaw.level || "-",
                     repairType: foundRaw.repairType || "อู่",
                     features: foundRaw.coverage || [], 
@@ -78,37 +64,35 @@ export default function SummaryPage() {
                     fireFloodCoverage: foundRaw.fireFloodCoverage || 0,
                     firstLossCoverage: foundRaw.firstLossCoverage || 0,
                 };
-                setSelectedPlan(mappedPlan);
             }
         }
-        setLoading(false);
-    }, [planId]);
+        return null;
+    });
+
+    // ✅ แก้ไข 2: ไม่จำเป็นต้องใช้ setLoading ใน useEffect แล้ว เพราะข้อมูลพร้อมตั้งแต่ต้น
+    const [loading] = useState(false);
 
     const handleProceed = () => {
         if (planId) {
-            // แก้ไข: ใช้ navigate() แทน router.push()
-            // ใช้ string template ในการสร้าง URL ที่มี Query Params
             navigate(`/customer/car-insurance/upload-documents?id=${planId}&agent=${agentCode}`);
         }
     };
 
-    if (loading) return <div className="text-center py-20">กำลังโหลดข้อมูล...</div>;
-    if (!selectedPlan) return <div className="text-center py-20 text-red-500">ไม่พบข้อมูลแผนประกัน</div>;
+    if (loading) return <div className="text-center py-20 font-bold">กำลังโหลดข้อมูล...</div>;
+    if (!selectedPlan) return <div className="text-center py-20 text-red-500 font-bold">ไม่พบข้อมูลแผนประกัน</div>;
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            {/* ⚠️ ต้องแน่ใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว */}
-            <MenuLogined activePage="/customer/car-insurance/summary" /> 
+            {/* ✅ แก้ไข 3: ลบ activePage ออกเพื่อแก้ Error TS2322 */}
+            <MenuLogined /> 
+            
             <div className="max-w-5xl mx-auto mt-10 px-4">
-                {/* แก้ไข: ใช้ navigate(-1) สำหรับ back */}
-                <button onClick={() => navigate(-1)} className="mb-4 text-gray-500 hover:text-blue-600 flex items-center gap-1">← ย้อนกลับ</button>
+                <button onClick={() => navigate(-1)} className="mb-4 text-gray-500 hover:text-blue-600 flex items-center gap-1 font-semibold">← ย้อนกลับ</button>
                 <h1 className="text-3xl font-bold text-blue-900 mb-6 text-center">สรุปแผนประกันที่คุณเลือก</h1>
 
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row">
-                    {/* ข้อมูลหลัก */}
                     <div className="bg-blue-50 p-8 md:w-1/3 flex flex-col items-center justify-start border-r border-blue-100">
                         <div className="relative w-32 h-32 mb-4">
-                            {/* แก้ไข: เปลี่ยน <Image> เป็น <img> */}
                            <img src={selectedPlan.logoSrc} alt={selectedPlan.company} className="object-contain w-full h-full"/>
                         </div>
                         <h2 className="text-xl font-bold text-gray-800 text-center mb-2">{selectedPlan.company}</h2>
@@ -130,7 +114,6 @@ export default function SummaryPage() {
                         </div>
                     </div>
 
-                    {/* รายละเอียดความคุ้มครอง */}
                     <div className="p-8 md:w-2/3">
                         <h3 className="text-lg font-semibold text-gray-800 mb-6 border-b pb-2">📄 รายละเอียดความคุ้มครอง</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-8">
@@ -146,7 +129,6 @@ export default function SummaryPage() {
                             <DetailItem label="ความรับผิดส่วนแรก" value={selectedPlan.firstLossCoverage} />
                         </div>
 
-                        {/* ช่องกรอกเลขตัวแทน */}
                         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-6">
                             <label className="block text-sm font-semibold text-yellow-800 mb-2">เลขที่ใบอนุญาตตัวแทน (ถ้ามี)</label>
                             <input type="text" value={agentCode} onChange={(e) => setAgentCode(e.target.value)} placeholder="ระบุรหัสตัวแทนแนะนำ" className="w-full pl-4 pr-4 py-3 rounded-lg border border-yellow-300 focus:outline-none" />

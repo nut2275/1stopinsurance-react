@@ -1,14 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
-// แก้ไข: นำเข้า useNavigate, useSearchParams จาก react-router-dom แทน next/navigation
+import { useState, useRef, type ChangeEvent } from "react"; // ✅ เพิ่ม ChangeEvent type
 import { useNavigate, useSearchParams } from "react-router-dom"; 
-// แก้ไข: ลบการนำเข้า Next.js Image
-// import Image from "next/image"; 
-// ⚠️ ต้องมั่นใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว
 import MenuLogined from "../../components/element/MenuLogined"; 
 import { CloudUpload, Delete, Description, DirectionsCar } from "@mui/icons-material";
-import axios from "axios"; // axios ใช้ได้ตามเดิม
+// ✅ แก้ไข: นำเข้า api แทน axios
+import api from "../../services/api";
 
-// Helper แปลง File เป็น Base64 (ไม่มีการเปลี่ยนแปลง)
+// Helper แปลง File เป็น Base64
 const toBase64 = (file: File) =>
     new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -17,7 +14,6 @@ const toBase64 = (file: File) =>
         reader.onerror = (error) => reject(error);
     });
 
-// รายชื่อจังหวัดไทย (ไม่มีการเปลี่ยนแปลง)
 const provinces = [
     "กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร",
     "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท",
@@ -37,13 +33,10 @@ const provinces = [
     "อุทัยธานี", "อุบลราชธานี", "อ่างทอง"
 ];
 
-// ลบ 'use client'
 export default function UploadDocumentsPage() {
-    // แก้ไข: ใช้ useNavigate() และ useSearchParams()
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     
-    // ดึงค่าจาก Query String
     const planId = searchParams.get("id");
     const agentCode = searchParams.get("agent");
 
@@ -55,25 +48,19 @@ export default function UploadDocumentsPage() {
     const [registration, setRegistration] = useState("");
     const [color, setColor] = useState("");
     const [province, setProvince] = useState(""); 
-    const [searchData, setSearchData] = useState<any>({});
+
+    const [searchData] = useState<any>(() => {
+        const storedSearch = localStorage.getItem("searchCriteria");
+        return storedSearch ? JSON.parse(storedSearch) : {};
+    });
 
     const idCardInputRef = useRef<HTMLInputElement>(null);
     const carRegInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        const storedSearch = localStorage.getItem("searchCriteria");
-        if (storedSearch) {
-            const parsedData = JSON.parse(storedSearch);
-            setSearchData(parsedData);
-            console.log("Loaded Car Data:", parsedData);
-        }
-    }, []);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setFile: any, setPreview: any) => {
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>, setFile: any, setPreview: any) => {
         const file = e.target.files?.[0];
         if (file) {
             setFile(file);
-            // ใช้งาน URL.createObjectURL() ได้ตามเดิม
             setPreview(URL.createObjectURL(file));
         }
     };
@@ -109,12 +96,11 @@ export default function UploadDocumentsPage() {
                 carRegistrationImage: carRegBase64
             };
 
-            // การเรียกใช้ axios ทำได้ตามเดิม
-            const response = await axios.post("http://localhost:5000/purchase/insurance", payload);
+            // ✅ แก้ไข: ใช้ api.post() แทน axios.post()
+            const response = await api.post("/purchase/insurance", payload);
 
             if (response.status === 201) {
                 alert("ระบบได้ทำการบันทึกข้อมูลแล้ว รอการตรวจสอบแล้วรอชำระเงินได้เลย");
-                // แก้ไข: ใช้ navigate() แทน router.push()
                 navigate("/customer/profile");
             }
         } catch (error) {
@@ -125,10 +111,9 @@ export default function UploadDocumentsPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            <MenuLogined activePage="/customer/car-insurance" />
+            <MenuLogined />
             <div className="max-w-4xl mx-auto mt-10 px-4">
-                {/* แก้ไข: ใช้ navigate(-1) สำหรับ back */}
-                <button onClick={() => navigate(-1)} className="mb-4 text-gray-500 hover:text-blue-600 flex items-center gap-1">← ย้อนกลับ</button>
+                <button onClick={() => navigate(-1)} className="mb-4 text-gray-500 hover:text-blue-600 flex items-center gap-1 font-semibold">← ย้อนกลับ</button>
                 <h1 className="text-3xl font-bold text-blue-900 mb-2 text-center">อัปโหลดเอกสารและข้อมูลรถ</h1>
                 <p className="text-gray-500 text-center mb-8">กรุณาระบุข้อมูลรถเพิ่มเติมและอัปโหลดเอกสาร</p>
 
@@ -137,15 +122,15 @@ export default function UploadDocumentsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-gray-700 text-sm font-bold mb-2">ทะเบียนรถยนต์</label>
-                            <input type="text" value={registration} onChange={(e) => setRegistration(e.target.value)} placeholder="เช่น กก-1234 กรุงเทพฯ" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" />
+                            <input type="text" value={registration} onChange={(e) => setRegistration(e.target.value)} placeholder="เช่น กก-1234 กรุงเทพฯ" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-100" />
                         </div>
                         <div>
                             <label className="block text-gray-700 text-sm font-bold mb-2">สีรถยนต์</label>
-                            <input type="text" value={color} onChange={(e) => setColor(e.target.value)} placeholder="เช่น ขาว, ดำ" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" />
+                            <input type="text" value={color} onChange={(e) => setColor(e.target.value)} placeholder="เช่น ขาว, ดำ" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-100" />
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2">จังหวัด</label>
-                            <select value={province} onChange={(e) => setProvince(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none">
+                            <select value={province} onChange={(e) => setProvince(e.target.value)} className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-100">
                                 <option value="">-- เลือกจังหวัด --</option>
                                 {provinces.map((prov) => (
                                     <option key={prov} value={prov}>{prov}</option>
@@ -168,7 +153,6 @@ export default function UploadDocumentsPage() {
     );
 }
 
-// ---------------------- UploadCard Component (ต้องแก้ไข Image tag) ----------------------
 const UploadCard = ({ title, icon, preview, inputRef, onUpload, onChange, onRemove, description }: any) => {
     return (
         <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col h-full">
@@ -177,10 +161,7 @@ const UploadCard = ({ title, icon, preview, inputRef, onUpload, onChange, onRemo
             <div className="flex-grow flex flex-col items-center justify-center min-h-[250px] bg-gray-50 rounded-xl border-2 border-dashed border-blue-200 relative overflow-hidden group hover:border-blue-400 transition-colors">
                 {preview ? (
                     <div className="relative w-full h-full flex items-center justify-center bg-black/5">
-                        <div className="relative w-full h-full">
-                            {/* แก้ไข: เปลี่ยน <Image> เป็น <img> */}
-                            <img src={preview} alt="Preview" className="object-contain p-2 w-full h-full" style={{ objectFit: 'contain' }} />
-                        </div>
+                        <img src={preview} alt="Preview" className="w-full h-full object-contain p-2" />
                         <button onClick={onRemove} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600 transition"><Delete className="text-xl" /></button>
                     </div>
                 ) : (

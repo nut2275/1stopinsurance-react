@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom' // 1. เปลี่ยน import
 
 function Footer() {

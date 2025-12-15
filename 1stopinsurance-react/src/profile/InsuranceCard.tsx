@@ -1,10 +1,5 @@
-// src/components/InsuranceCard.tsx
-// แก้ไข: นำเข้า useNavigate จาก react-router-dom
 import { useNavigate } from "react-router-dom"; 
-// ลบการนำเข้า Next.js Font 
-// import { Prompt } from "next/font/google"; 
 
-// Types (ย้ายไปไว้ในไฟล์ types/Insurance.ts หรือคงไว้ตามเดิม)
 export type InsuranceStatus =
     | "active"
     | "expiring"
@@ -61,24 +56,20 @@ const statusConfig: Record<InsuranceStatus, StatusDetails> = {
     },
 };
 
-// ลบการ export font prompt ออกไป
-// export const prompt = Prompt({...}); 
-
 type InsuranceCardProps = {
     policy: InsurancePolicy;
     className?: string;
 };
 
-// ลบ 'use client'
 export default function InsuranceCard({
     policy,
     className = "",
 }: InsuranceCardProps) {
-    // แก้ไข: ใช้ useNavigate()
     const navigate = useNavigate(); 
     const config = statusConfig[policy.status];
-
     const isPendingPayment = policy.status === "pending_payment";
+
+    // ✅ แก้ไข: ลบบรรทัด const currentPath = ... ออกไปแล้วเพื่อล้าง Error TS6133
 
     return (
         <div className={`card border-t-4 ${config.borderColor} ${className}`}>
@@ -92,7 +83,7 @@ export default function InsuranceCard({
             </div>
 
             <p className="text-sm text-gray-700">
-                <b>ประกันรถยนต์:</b> {policy.title.split(": ")[1]}
+                <b>ประกันรถยนต์:</b> {policy.title.split(": ")[1] || policy.title}
             </p>
             <p className="text-sm text-gray-600">ทะเบียน: {policy.registration}</p>
             <p className="text-sm text-gray-600 mb-4">
@@ -102,7 +93,6 @@ export default function InsuranceCard({
             <div className="flex justify-between gap-2">
                 <button
                     className="btn btn-dark flex-1"
-                    // แก้ไข: ใช้ navigate() แทน router.push()
                     onClick={() => navigate(`/customer/purchase/${policy.id}`)}
                 >
                     <i className="fa-regular fa-file-lines mr-2"></i> ดูเอกสาร
@@ -110,10 +100,7 @@ export default function InsuranceCard({
 
                 <button
                     className="btn btn-green flex-1"
-                    // แก้ไข: ใช้ navigate() แทน router.push()
-                    onClick={() =>
-                        navigate(`/customer/agent/${policy.id}`)
-                    }
+                    onClick={() => navigate(`/customer/agent/${policy.id}`)}
                 >
                     <i className="fa-solid fa-phone-volume mr-2"></i>
                     {isPendingPayment
