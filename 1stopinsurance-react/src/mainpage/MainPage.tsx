@@ -1,0 +1,80 @@
+import React from 'react'; 
+// แก้ไข: นำเข้า Link จาก react-router-dom แทน next/link
+import { Link } from 'react-router-dom'; 
+// ⚠️ ต้องมั่นใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว
+import MenuLogined from '../components/element/MenuLogined'; 
+// ลบการนำเข้า Next.js Image
+
+// ลบ export default function MainPage()
+export default function MainPage() {
+  
+  return (
+    <div className="flex flex-col min-h-screen font-sans text-gray-800 bg-gray-50">
+
+      {/* Header */}
+      {/* ⚠️ ต้องแน่ใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว */}
+      <MenuLogined activePage='/' />
+
+      {/* Main content */}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-blue-100 to-blue-200 py-12">
+          <div className="max-w-6xl mx-auto bg-white/50 backdrop-blur-sm rounded-2xl p-8 flex flex-col md:flex-row items-center gap-10 shadow-lg border border-white/30">
+            <div className="relative w-full md:w-96 h-60 md:h-auto md:aspect-square rounded-lg shadow-md overflow-hidden">
+                {/* แก้ไข: เปลี่ยน <Image> เป็น <img> */}
+                <img
+                  src="/fotos/Home1.png"
+                  alt="รถยนต์ที่ได้รับการคุ้มครอง"
+                  className="w-full h-full object-cover"
+                  // สำหรับ Pure React, width/height ควรถูกควบคุมด้วย CSS/Tailwind
+                  // width={384}
+                  // height={384}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+            </div>
+
+            <div className="text-blue-900 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl font-bold">
+                1StopInsurance <span className="text-blue-700">ดูแลคุณทุกช่วงเวลา</span>
+              </h1>
+              <p className="mt-2 text-gray-600 text-lg">พร้อมบริการประกันครบวงจร</p>
+
+              <div className="mt-6 bg-white/60 p-4 rounded-lg">
+                <h2 className="text-xl md:text-2xl font-semibold">
+                  ประกันรถยนต์ เริ่มต้น <span className="text-blue-800 font-bold">7,xxx</span>
+                </h2>
+                <p className="text-xl"><span className="text-blue-800 font-bold">ผ่อน 0%</span> นาน 10 เดือน</p>
+              </div>
+
+              {/* แก้ไข: ใช้ Link to={...} */}
+              <Link to="/customer/car-insurance/car-Insurance-form"
+                  className="inline-block mt-8 bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                เช็คเบี้ยประกันรถยนต์ →
+              </Link>
+            </div>
+          </div>
+
+
+        </section>
+
+        {/* Partners Section */}
+        <section className="text-center py-16 px-6 bg-white">
+          <h2 className="text-3xl font-bold text-gray-900">พันธมิตรของเรา</h2>
+          <p className="mt-2 text-gray-500 max-w-2xl mx-auto">
+            1StopInsurance มีแผนประกันรถยนต์ให้คุณเลือกเปรียบเทียบจากบริษัทชั้นนำ
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-6 mt-10">
+            {/* แก้ไข: เปลี่ยน <Image> เป็น <img> และกำหนด width/height ด้วย attribute หรือ CSS */}
+            <img src="/fotos/Insur1.png" alt="Partner 1" width={60} height={60} style={{ width: 60, height: 60 }}/>
+            <img src="/fotos/Insur2.png" alt="Partner 2" width={60} height={60} style={{ width: 60, height: 60 }}/>
+            <img src="/fotos/Insur3.png" alt="Partner 3" width={60} height={60} style={{ width: 60, height: 60 }}/>
+            <img src="/fotos/Insur4.png" alt="Partner 4" width={60} height={60} style={{ width: 60, height: 60 }}/>
+            <img src="/fotos/Insur5.png" alt="Partner 5" width={60} height={60} style={{ width: 60, height: 60 }}/>
+            <img src="/fotos/Insur6.png" alt="Partner 6" width={60} height={60} style={{ width: 60, height: 60 }}/>
+          </div>
+        </section>
+      </main>
+
+    </div>
+  );
+}
