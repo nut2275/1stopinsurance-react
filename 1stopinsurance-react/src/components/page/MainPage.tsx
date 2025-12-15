@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Menu from '../element/Menu';
 // import Menu from '@/components/element/Menu'; // ❌ ไม่ต้อง import แล้ว เพราะจะไปอยู่ใน Layout
 
 export default function MainPage() {
@@ -7,7 +8,7 @@ export default function MainPage() {
     <div className="flex flex-col min-h-screen font-sans text-gray-800 bg-gray-50">
 
       {/* Header: ❌ ลบออก เพราะ Layout จะจัดการให้ */}
-      {/* <Menu /> */}
+      <Menu />
 
       {/* Main content */}
       <main className="flex-grow">
