@@ -4,7 +4,7 @@ import { useState, FormEvent } from 'react';
 // แก้ไข: นำเข้า useNavigate จาก react-router-dom แทน next/navigation
 import { useNavigate } from 'react-router-dom'; 
 // ⚠️ ต้องมี initialAnswers และ types ในไฟล์ Survey.ts
-import { InsuranceAnswers, Budget, Repair, Coverage, Usage, Accident, initialAnswers } from '../types/Survey'; 
+import { InsuranceAnswers, Budget, Repair, Coverage, Usage, Accident, initialAnswers } from '../../types/Survey'; 
 
 // นำเข้า MUI Icons (ไม่มีการเปลี่ยนแปลง)
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';

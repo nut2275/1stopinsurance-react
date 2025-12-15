@@ -14,6 +14,12 @@ import EditProfileForm from './profile/edit-profile/EditProfileForm';
 import MainPageLogged from './mainpage/MainPage';
 import PurchaseDocumentPage from './purchase/PurchaseDocumentPage';
 
+import CarInsuranceForm from './car-insurance/car-Insurance-form/CarInsuranceForm';
+import InsuranceResultsPage from './car-insurance/insurance/InsuranceResultsPage';
+
+import SummaryInsurance from './car-insurance/summary/SummaryInsurance';
+import UploadDocumentsPage from './car-insurance/upload-documents/DocumentsUpload';
+
 
 function App() {
   return (
@@ -32,6 +38,11 @@ function App() {
       <Route path="/customer/register" element={<RegisterForm />} />
       <Route path="/customer/mainpage" element={<MainPageLogged />} />
       <Route path="/customer/purchase/:id" element={<PurchaseDocumentPage />} />
+
+      <Route path="/customer/car-insurance/car-Insurance-form" element={<CarInsuranceForm />} />
+      <Route path="/customer/car-insurance/insurance" element={<InsuranceResultsPage />} />
+      <Route path="/customer/car-insurance/summary" element={<SummaryInsurance />} />
+      <Route path="/customer/car-insurance/upload-documents" element={<UploadDocumentsPage />} />
     </Routes>
   );
 }
