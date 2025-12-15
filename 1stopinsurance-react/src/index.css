@@ -15,3 +15,64 @@
 .animate-fade-in-down {
   animation: fade-in-down 0.2s ease-out;
 }
+
+/*
+  ถ้าคุณใช้ Tailwind CSS ให้ตรวจสอบว่าไฟล์นี้ถูก @import หรือ @tailwind utilities ต่างๆ แล้ว
+*/
+
+/* Global Body Style */
+body {
+    background-color: #f9fafb; /* สีพื้นหลังหลักของหน้าเพจ */
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    transition: 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px); /* เอฟเฟกต์ยกขึ้นเมื่อ Hover */
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Badge Styles (ใช้ใน InsuranceCard) */
+.status-badge {
+    font-weight: 600;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+/* Base Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 8px 12px;
+}
+
+/* Dark Button Styles (ใช้ใน InsuranceCard: ดูเอกสาร) */
+.btn-dark {
+    background-color: #374151; /* gray-700 */
+    color: white;
+}
+.btn-dark:hover {
+    background-color: #111827; /* gray-900 */
+}
+
+/* Green Button Styles (ใช้ใน InsuranceCard: ติดต่อเจ้าหน้าที่) */
+.btn-green {
+    background-color: #16a34a; /* green-600 */
+    color: white;
+}
+.btn-green:hover {
+    background-color: #15803d; /* green-800 */
+}

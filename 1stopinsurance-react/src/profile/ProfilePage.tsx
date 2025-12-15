@@ -8,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios"; // ใช้ axios ตรงๆ หรือใช้ api service ที่คุณสร้างเอง
 
 // Components (สมมติว่าถูกแปลงเป็น Pure React แล้ว)
-import MenuLogined from "@/components/element/MenuLogined";
+import MenuLogined from "../components/element/MenuLogined";
 import ProfileCard from "./ProfileCard";
 import InsuranceCard, { InsurancePolicy, InsuranceStatus } from "./InsuranceCard"; 
 // import { GlobalStyles } from "./GlobalStyles"; // ลบเนื่องจากจะใช้ CSS/External Script
