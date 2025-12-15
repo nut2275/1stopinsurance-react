@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, FormEvent } from 'react';
 // แก้ไข: นำเข้า useNavigate จาก react-router-dom แทน next/navigation
 import { useNavigate } from 'react-router-dom';
 import { DriveEta, CalendarToday, Build, CheckCircle } from '@mui/icons-material';
+import MenuLogined from '../../components/element/MenuLogined';
 
 // ------------------- Type Definitions -------------------
 interface CarModels {
@@ -255,7 +256,9 @@ export default function CarInsuranceForm() {
     const submodelList = brand && model ? carData[brand]?.[model] : [];
 
     return (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 lg:p-10 border-t-4 border-blue-600">
+        <div>
+            <MenuLogined />
+             <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 lg:p-10 border-t-4 border-blue-600 mt-5">
             <h1 className="text-center text-3xl font-extrabold text-blue-900 mb-4 tracking-tight">
                 เช็คเบี้ย เปรียบเทียบ ประกันรถยนต์
             </h1>
@@ -374,6 +377,7 @@ export default function CarInsuranceForm() {
                     </button>
                 </div>
             </form>
+        </div>
         </div>
     );
 }

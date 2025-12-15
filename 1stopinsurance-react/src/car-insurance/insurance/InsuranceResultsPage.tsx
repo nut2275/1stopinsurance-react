@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { Search, Assignment } from "@mui/icons-material";
 // ⚠️ หมายเหตุ: ต้องมั่นใจว่า Component MenuLogined ถูกแปลงเป็น Pure React แล้ว
-import MenuLogined from "../components/element/MenuLogined"; 
+import MenuLogined from "../../components/element/MenuLogined"; 
 // นำเข้า InsuranceCard ที่ถูกแปลงแล้ว
-import InsuranceCard, { InsurancePlan } from "./InsuranceCard"; 
+import InsuranceCard, {type InsurancePlan } from "./InsuranceCard"; 
 
 // Interface สำหรับข้อมูลดิบที่รับมาจาก Backend (แทน any)
 

@@ -1,6 +1,6 @@
 import React from 'react'; 
 import { Link } from 'react-router-dom'; 
-import MenuLogined from '../components/element/MenuLogined'; 
+import MenuLogined from '../components/element/MenuLogined';
 
 export default function MainPage() {
   return (

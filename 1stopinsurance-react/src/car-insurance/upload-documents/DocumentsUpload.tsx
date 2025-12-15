@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 // แก้ไข: ลบการนำเข้า Next.js Image
 // import Image from "next/image"; 
 // ⚠️ ต้องมั่นใจว่า MenuLogined ถูกแปลงเป็น Pure React แล้ว
-import MenuLogined from "../components/element/MenuLogined"; 
+import MenuLogined from "../../components/element/MenuLogined"; 
 import { CloudUpload, Delete, Description, DirectionsCar } from "@mui/icons-material";
 import axios from "axios"; // axios ใช้ได้ตามเดิม
 
