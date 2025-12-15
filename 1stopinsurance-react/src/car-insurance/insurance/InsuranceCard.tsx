@@ -25,8 +25,28 @@ const InsuranceCard: React.FC<{ plan: InsurancePlan }> = ({ plan }) => {
     const navigate = useNavigate();
 
     const handleDetailClick = () => {
-        // แก้ไข: เปลี่ยน router.push() เป็น navigate()
-        navigate(`/customer/car-insurance/summary?id=${plan.id}`);
+        // 1. ตรวจสอบ Token
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            // 2. ถ้าไม่มี Token (ไม่ได้ Login)
+            
+            // ⚠️ เก็บ URL ปัจจุบันไว้ใน state หรือ query param
+            // window.location.pathname จะให้ path คือ /customer/car-insurance/insurance
+            const currentPath = window.location.pathname; 
+            
+            // 3. เด้งไปหน้า Login พร้อมส่ง state ว่าให้กลับมาที่ไหน
+            alert("กรุณาเข้าสู่ระบบก่อนดำเนินการต่อ");
+            navigate("/customer/login", { 
+                state: { 
+                    from: `/customer/car-insurance/summary?id=${plan.id}` 
+                } 
+            });
+            
+        } else {
+            // 4. ถ้ามี Token (Login แล้ว) ให้ดำเนินการต่อ
+            navigate(`/customer/car-insurance/summary?id=${plan.id}`);
+        }
     };
 
     return (
@@ -39,8 +59,6 @@ const InsuranceCard: React.FC<{ plan: InsurancePlan }> = ({ plan }) => {
                     <img 
                         src={plan.logoSrc}
                         alt={plan.company}
-                        // คุณต้องจัดการ styles: object-contain, fill, w-full, h-full เอง 
-                        // เพื่อให้ทำงานเหมือน Next/Image
                         className="object-contain w-full h-full" 
                         style={{ objectFit: 'contain' }}
                     />
@@ -49,7 +67,7 @@ const InsuranceCard: React.FC<{ plan: InsurancePlan }> = ({ plan }) => {
                 <h3 className="font-extrabold text-xl text-blue-900 text-center mb-1">
                     {plan.company}
                 </h3>
-
+                {/* ... (UI ส่วนอื่น ๆ เหมือนเดิม) ... */}
                 <p className="text-sm text-gray-600 mb-3 text-center">
                     {plan.level} | ซ่อม{plan.repairType}
                 </p>
@@ -89,7 +107,7 @@ const InsuranceCard: React.FC<{ plan: InsurancePlan }> = ({ plan }) => {
 
             {/* ปุ่มกด */}
             <button
-                onClick={handleDetailClick}
+                onClick={handleDetailClick} // ใช้ฟังก์ชันที่แก้ไขแล้ว
                 className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl text-lg transition-shadow shadow-md hover:shadow-lg mt-auto"
             >
                 สนใจแผนนี้
