@@ -1,21 +1,25 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+
+// ✅ Import ตามโครงสร้างไฟล์ในภาพ image_c5341e.png
 import MainLayout from './layouts/MainLayout';
-import MainPage from './components/page/MainPage';
+import MainPage from './components/page/MainPage'; 
+import LoginForm from './login/LoginForm';
+import RegisterForm from './register/RegisterForm'; // (สมมติว่าข้างในไฟล์ RegisterForm ก็แก้เป็น React แล้ว)
 
 function App() {
   return (
     <Routes>
-      {/* กลุ่มหน้าเว็บทั่วไป (ใช้ MainLayout ครอบ) */}
+      {/* 🟢 กลุ่มหน้าเว็บทั่วไป (ใช้ MainLayout) */}
       <Route element={<MainLayout />}>
-        {/* path "/" คือหน้าแรกสุด */}
         <Route path="/" element={<MainPage />} />
-        
-        {/* อนาคตเพิ่มหน้าอื่นๆ ตรงนี้ได้เลย เช่น: */}
-        {/* <Route path="/about" element={<AboutPage />} /> */}
+        {/* <Route path="/customer/profile" element={<ProfilePage />} />  <-- เดี๋ยวค่อยมาเปิดบรรทัดนี้ตอนทำ Profile เสร็จ */}
       </Route>
 
-      {/* ถ้ามีหน้า Login แยก ที่ไม่อยากได้ Header/Footer เดิม ก็เพิ่มตรงนี้ได้ */}
+      {/* 🔴 หน้า Login/Register (แยกออกมา ไม่มี Layout) */}
+      <Route path="/customer/login" element={<LoginForm />} />
+      <Route path="/customer/register" element={<RegisterForm />} />
+      
     </Routes>
   );
 }
