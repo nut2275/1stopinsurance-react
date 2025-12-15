@@ -9,7 +9,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import CakeIcon from '@mui/icons-material/Cake';
 import EditIcon from '@mui/icons-material/Edit';
 // ⚠️ ต้องมี Customer type ในไฟล์ dataType
-import { Customer } from '../types/dataType'; 
+import { type Customer } from '../types/dataType'; 
 
 const iconMap = {
     "location": LocationOnIcon,

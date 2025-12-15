@@ -1,51 +1,28 @@
-<<<<<<< HEAD
-import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
-// แก้ไข: นำเข้า useNavigate และ useSearchParams จาก react-router-dom
-import { useNavigate, useSearchParams } from 'react-router-dom'; 
-// ลบการนำเข้า Next.js Image
+import React, { useState, type FormEvent, type ChangeEvent } from 'react'; // ✅ แก้ตรงนี้ครับ
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Person, Email, Phone, Home, Cake, CloudUpload, CheckCircle } from '@mui/icons-material';
-import api from '../../services/api'; 
-import axios from 'axios'; 
-import { mutate } from "swr"; 
-import { Customer } from '../../types/dataType'; // ⚠️ ต้องมี Customer type
+import axios from 'axios';
+import { mutate } from "swr";
 
-// ลบ 'use client'
+import api from '../../services/api';
+import { type Customer } from '../../types/dataType';
+
 export default function EditProfileForm() {
-    // แก้ไข: ใช้ useNavigate()
     const navigate = useNavigate();
-    // แก้ไข: ใช้ useSearchParams() จาก react-router-dom
-    const [searchParams] = useSearchParams(); 
+    const [searchParams] = useSearchParams();
 
-    // 1. ตั้งค่าเริ่มต้น (ไม่มีการเปลี่ยนแปลง)
-    const [formData, setFormData] = useState<Customer>({
-        _id: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        address: "",
-        birth_date: new Date(),
-        phone: "",
-        username: "",
-        password: "",
-        imgProfile_customer: "/fotos/noPrafile.jpg",
-    });
+    // ฟังก์ชันช่วย Decode URL
+    const decode = (str: string | null) => str ? decodeURIComponent(str) : "";
 
-    const [profilePreview, setProfilePreview] = useState<string>("/fotos/noPrafile.jpg");
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [formData, setFormData] = useState<Customer>(() => {
+        const hasParams = searchParams.get('first_name');
 
-    // 2. useEffect: ดึงข้อมูลจาก URL
-    useEffect(() => {
-        // ใช้ searchParams.get() ได้ตามเดิม
-        if (searchParams.get('first_name')) { 
-            const id = searchParams.get('_id'); // หรือ 'id' ตามที่คุณส่งมา
+        if (hasParams) {
             const birthDateStr = searchParams.get('birth_date');
             const imgProfile = searchParams.get('imgProfile_customer');
-            
-            // Note: ต้อง Decode URL component ถ้ามีอักขระพิเศษในชื่อหรือที่อยู่
-            const decode = (str: string | null) => str ? decodeURIComponent(str) : "";
-            
-            setFormData({
-                _id: decode(id) || "", 
+
+            return {
+                _id: decode(searchParams.get('_id')) || "",
                 first_name: decode(searchParams.get('first_name')) || "",
                 last_name: decode(searchParams.get('last_name')) || "",
                 email: decode(searchParams.get('email')) || "",
@@ -55,16 +32,35 @@ export default function EditProfileForm() {
                 username: "",
                 password: "",
                 imgProfile_customer: decode(imgProfile) || "/fotos/noPrafile.jpg"
-            });
-
-            setProfilePreview(decode(imgProfile) || "/fotos/noPrafile.jpg");
+            };
         }
-    }, [searchParams]);
 
-    // Helper Date (ไม่มีการเปลี่ยนแปลง)
-    const formatDateForInput = (date: Date) => {
-        if (!date || isNaN(date.getTime())) return "";
-        return date.toISOString().split('T')[0];
+        return {
+            _id: "",
+            first_name: "",
+            last_name: "",
+            email: "",
+            address: "",
+            birth_date: new Date(),
+            phone: "",
+            username: "",
+            password: "",
+            imgProfile_customer: "/fotos/noPrafile.jpg",
+        };
+    });
+
+    const [profilePreview, setProfilePreview] = useState<string>(() => {
+        const img = searchParams.get('imgProfile_customer');
+        return img ? decodeURIComponent(img) : "/fotos/noPrafile.jpg";
+    });
+
+    const [showModal, setShowModal] = useState<boolean>(false);
+
+    const formatDateForInput = (date: Date | string) => {
+        if (!date) return "";
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return "";
+        return d.toISOString().split('T')[0];
     };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -86,7 +82,6 @@ export default function EditProfileForm() {
         }
     };
 
-    // ✅ handleSubmit ที่ใช้ api instance (ไม่มีการเปลี่ยนแปลง Logic)
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -94,7 +89,6 @@ export default function EditProfileForm() {
         if (!targetId) return alert("ไม่พบ User ID");
 
         try {
-            // ยิง API PUT
             const response = await api.put(`/customers/${targetId}`, {
                 first_name: formData.first_name,
                 last_name: formData.last_name,
@@ -110,7 +104,6 @@ export default function EditProfileForm() {
             }
 
         } catch (error) {
-            // จัดการ Error (ไม่มีการเปลี่ยนแปลง Logic)
             if (axios.isAxiosError(error)) {
                 console.error("Axios Error:", error.response?.data);
                 alert(error.response?.data?.message || "บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง");
@@ -123,19 +116,14 @@ export default function EditProfileForm() {
 
     const handleModalConfirm = () => {
         setShowModal(false);
-        
-        // ✅ สั่งให้ SWR ไปโหลดข้อมูลใหม่ทันที (Re-validate)
-        mutate("/customers/profile"); 
-
-        // แก้ไข: ใช้ navigate() แทน router.push()
+        mutate("/customers/profile");
         navigate("/customer/profile");
     };
 
     return (
-        <div className='my-10'>
-            {/* Modal */}
+        <div className='my-10 px-4'>
             {showModal && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-300">
+                <div className="fixed inset-0 bg-gray-900/70 flex items-center justify-center z-[9999] transition-opacity duration-300">
                     <div className="bg-white rounded-xl shadow-2xl p-8 max-w-sm text-center transform scale-100 transition-transform">
                         <CheckCircle className="text-green-500 mx-auto mb-4" style={{ fontSize: '3rem' }} />
                         <h2 className="text-xl font-bold mb-3 text-gray-800">บันทึกข้อมูลสำเร็จ!</h2>
@@ -150,22 +138,16 @@ export default function EditProfileForm() {
                 </div>
             )}
 
-            {/* Form Card */}
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 lg:p-10 border-t-4 border-blue-600">
-                <h1 className="text-3xl font-bold text-blue-900 mb-8 text-center tracking-tight">แก้ไขโปรไฟล์</h1>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-6 lg:p-10 border-t-4 border-blue-600">
+                <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-8 text-center tracking-tight">แก้ไขโปรไฟล์</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Profile Picture */}
-                    <div className="text-center pb-4 border-b border-gray-100">
-                        {/* แก้ไข: ใช้ <img> แทน <Image> */}
+                    <div className="text-center pb-4 border-b border-gray-100 flex flex-col items-center">
                         <img
                             id="profilePreview"
                             src={profilePreview}
                             alt="profile preview"
-                            // width={96}
-                            // height={96}
-                            className="mx-auto h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow-md mb-4"
-                            style={{ width: '6rem', height: '6rem' }} // กำหนดขนาดด้วย style/CSS
+                            className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow-md mb-4"
                         />
                         <label htmlFor="file-upload" className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-full cursor-pointer hover:bg-blue-600 transition shadow-md">
                             <CloudUpload style={{ fontSize: '1.2rem' }} />
@@ -180,13 +162,10 @@ export default function EditProfileForm() {
                         />
                     </div>
 
-                    {/* First & Last Name */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Input Fields (ไม่มีการเปลี่ยนแปลง) */}
-                        {/* ... */}
                         <div>
-                            <label htmlFor="first_name" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                                <Person className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> ชื่อจริง
+                            <label htmlFor="first_name" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                                <Person className="text-blue-500" /> ชื่อจริง
                             </label>
                             <input
                                 type="text"
@@ -194,13 +173,13 @@ export default function EditProfileForm() {
                                 name="first_name"
                                 value={formData.first_name}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none"
                                 required
                             />
                         </div>
                         <div>
-                            <label htmlFor="last_name" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                                <Person className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> นามสกุล
+                            <label htmlFor="last_name" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                                <Person className="text-blue-500" /> นามสกุล
                             </label>
                             <input
                                 type="text"
@@ -208,16 +187,15 @@ export default function EditProfileForm() {
                                 name="last_name"
                                 value={formData.last_name}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none"
                                 required
                             />
                         </div>
                     </div>
 
-                    {/* Birth Date */}
                     <div>
-                        <label htmlFor="birth_date" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                            <Cake className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> วันเกิด
+                        <label htmlFor="birth_date" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                            <Cake className="text-blue-500" /> วันเกิด
                         </label>
                         <input
                             type="date"
@@ -225,15 +203,14 @@ export default function EditProfileForm() {
                             name="birth_date"
                             value={formatDateForInput(formData.birth_date)}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none"
                         />
                     </div>
 
-                    {/* Phone & Email */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="phone" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                                <Phone className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> เบอร์โทรศัพท์
+                            <label htmlFor="phone" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                                <Phone className="text-blue-500" /> เบอร์โทรศัพท์
                             </label>
                             <input
                                 type="text"
@@ -241,12 +218,12 @@ export default function EditProfileForm() {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none"
                             />
                         </div>
                         <div>
-                            <label htmlFor="email" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                                <Email className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> อีเมล
+                            <label htmlFor="email" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                                <Email className="text-blue-500" /> อีเมล
                             </label>
                             <input
                                 type="email"
@@ -254,15 +231,14 @@ export default function EditProfileForm() {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none"
                             />
                         </div>
                     </div>
 
-                    {/* Address */}
                     <div>
-                        <label htmlFor="address" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                            <Home className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> ที่อยู่
+                        <label htmlFor="address" className="block font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                            <Home className="text-blue-500" /> ที่อยู่
                         </label>
                         <textarea
                             id="address"
@@ -270,22 +246,21 @@ export default function EditProfileForm() {
                             rows={3}
                             value={formData.address}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition outline-none resize-none"
                         ></textarea>
                     </div>
 
-                    {/* Buttons */}
-                    <div className="flex justify-between pt-4">
-                        <a
-                            // แก้ไข: ใช้ navigate() แทน router.push()
+                    <div className="flex justify-between pt-4 gap-4">
+                        <button
+                            type="button"
                             onClick={() => navigate("/customer/profile")}
-                            className="px-8 py-3 bg-gray-300 rounded-lg font-bold hover:bg-gray-400 transition cursor-pointer text-gray-800"
+                            className="flex-1 px-8 py-3 bg-gray-200 rounded-lg font-bold hover:bg-gray-300 transition text-gray-800"
                         >
                             ยกเลิก
-                        </a>
+                        </button>
                         <button
                             type="submit"
-                            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg"
+                            className="flex-1 px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg"
                         >
                             บันทึก
                         </button>
@@ -295,294 +270,3 @@ export default function EditProfileForm() {
         </div>
     );
 }
-=======
-"use client";
-
-import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import { Person, Email, Phone, Home, Cake, CloudUpload, CheckCircle } from '@mui/icons-material';
-import api from '@/services/api'; // ✅ เรียกใช้ api ที่คุณสร้างไว้
-import axios from 'axios'; // เอาไว้เช็ค Error type
-import { mutate } from "swr"; // ✅ เพิ่มบรรทัดนี้
-import { Customer } from '@/types/dataType';
-
-export default function EditProfileForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // 1. ตั้งค่าเริ่มต้น
-  const [formData, setFormData] = useState<Customer>({
-    _id: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    address: "",
-    birth_date: new Date(),
-    phone: "",
-    username: "",
-    password: "",
-    imgProfile_customer: "/fotos/noPrafile.jpg",
-  }
-);
-
-  const [profilePreview, setProfilePreview] = useState<string>("/fotos/noPrafile.jpg");
-  const [showModal, setShowModal] = useState<boolean>(false);
-
-  // 2. useEffect: ดึงข้อมูลจาก URL
-  useEffect(() => {
-    if (searchParams.get('first_name')) {
-      const birthDateStr = searchParams.get('birth_date');
-      const imgProfile = searchParams.get('imgProfile_customer');
-
-      setFormData({
-        _id: searchParams.get('id') || "", // ✅ แก้เป็น 'id' ให้ตรงกับที่ส่งมา
-        first_name: searchParams.get('first_name') || "",
-        last_name: searchParams.get('last_name') || "",
-        email: searchParams.get('email') || "",
-        phone: searchParams.get('phone') || "",
-        address: searchParams.get('address') || "",
-        birth_date: birthDateStr ? new Date(birthDateStr) : new Date(),
-        username: "",
-        password: "",
-        imgProfile_customer: imgProfile || "/fotos/noPrafile.jpg"
-      });
-
-      setProfilePreview(imgProfile || "/fotos/noPrafile.jpg");
-    }
-  }, [searchParams]);
-
-  // Helper Date
-  const formatDateForInput = (date: Date) => {
-    if (!date || isNaN(date.getTime())) return "";
-    return date.toISOString().split('T')[0];
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'birth_date' ? new Date(value) : value,
-    }));
-  };
-
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // ✅ handleSubmit ที่ใช้ api instance
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    // 1. หา ID (จาก State หรือ URL)
-    const targetId = formData._id || searchParams.get('_id');
-    if (!targetId) return alert("ไม่พบ User ID");
-
-    try {
-      // 2. ยิง API (ใช้ api.put แทน axios.put)
-      // หมายเหตุ: ต้องใส่ /api นำหน้า ถ้า Backend Route อยู่ที่ /api/customers
-      // เพราะ baseURL คือ http://localhost:5000 เฉยๆ
-      const response = await api.put(`/customers/${targetId}`, {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        birth_date: formData.birth_date,
-        imgProfile_customer: profilePreview
-      });
-
-      if (response.status === 200) {
-        setShowModal(true);
-      }
-
-    } catch (error) {
-      // 3. จัดการ Error
-      if (axios.isAxiosError(error)) {
-        console.error("Axios Error:", error.response?.data);
-        alert(error.response?.data?.message || "บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง");
-      } else {
-        console.error("Unknown Error:", error);
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Server");
-      }
-    }
-  };
-
-  const handleModalConfirm = () => {
-    setShowModal(false);
-    
-    // ✅ สั่งให้ SWR ไปโหลดข้อมูลใหม่ทันที (Re-validate)
-    // Key นี้ต้องตรงกับ useSWR("/customers/profile", ...) ในหน้า ProfilePage เป๊ะๆ
-    mutate("/customers/profile"); 
-
-    router.push("/customer/profile");
-  };
-
-  return (
-    <div className='my-10'>
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-300">
-          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-sm text-center transform scale-100 transition-transform">
-            <CheckCircle className="text-green-500 mx-auto mb-4" style={{ fontSize: '3rem' }} />
-            <h2 className="text-xl font-bold mb-3 text-gray-800">บันทึกข้อมูลสำเร็จ!</h2>
-            <p className="text-gray-600 mb-6">ข้อมูลโปรไฟล์ของคุณถูกอัปเดตเรียบร้อยแล้ว</p>
-            <button
-              onClick={handleModalConfirm}
-              className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              ตกลง
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Form Card */}
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 lg:p-10 border-t-4 border-blue-600">
-        <h1 className="text-3xl font-bold text-blue-900 mb-8 text-center tracking-tight">แก้ไขโปรไฟล์</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Picture */}
-          <div className="text-center pb-4 border-b border-gray-100">
-            <Image
-              id="profilePreview"
-              src={profilePreview}
-              alt="profile preview"
-              width={96}
-              height={96}
-              className="mx-auto h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow-md mb-4"
-              priority
-            />
-            <label htmlFor="file-upload" className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-full cursor-pointer hover:bg-blue-600 transition shadow-md">
-              <CloudUpload style={{ fontSize: '1.2rem' }} />
-              <span className="font-semibold text-sm">อัปโหลดรูปโปรไฟล์ใหม่</span>
-            </label>
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </div>
-
-          {/* First & Last Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="first_name" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                <Person className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> ชื่อจริง
-              </label>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="last_name" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                <Person className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> นามสกุล
-              </label>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Birth Date */}
-          <div>
-            <label htmlFor="birth_date" className="block font-semibold mb-2 text-gray-700 flex items-center">
-              <Cake className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> วันเกิด
-            </label>
-            <input
-              type="date"
-              id="birth_date"
-              name="birth_date"
-              value={formatDateForInput(formData.birth_date)}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-            />
-          </div>
-
-          {/* Phone & Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="phone" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                <Phone className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> เบอร์โทรศัพท์
-              </label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block font-semibold mb-2 text-gray-700 flex items-center">
-                <Email className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> อีเมล
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <label htmlFor="address" className="block font-semibold mb-2 text-gray-700 flex items-center">
-              <Home className="mr-2 text-blue-500" style={{ fontSize: '1.2rem' }} /> ที่อยู่
-            </label>
-            <textarea
-              id="address"
-              name="address"
-              rows={3}
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition"
-            ></textarea>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between pt-4">
-            <a
-              onClick={() => router.push("/customer/profile")}
-              className="px-8 py-3 bg-gray-300 rounded-lg font-bold hover:bg-gray-400 transition cursor-pointer text-gray-800"
-            >
-              ยกเลิก
-            </a>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg"
-            >
-              บันทึก
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
->>>>>>> d982cee2c60653760d3ed45ae44f85ed7c3a9fdc

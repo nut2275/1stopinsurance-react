@@ -1,23 +1,17 @@
-// src/pages/ProfilePage.tsx (หรือตามโครงสร้าง)
-
 import React, { useState, useEffect } from "react";
-// แก้ไข: นำเข้า useNavigate จาก react-router-dom
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom"; // ✅ แก้ไข 5: เพิ่ม Link เข้ามา
 import useSWR from 'swr';
 import { jwtDecode } from "jwt-decode";
-import axios from "axios"; // ใช้ axios ตรงๆ หรือใช้ api service ที่คุณสร้างเอง
+import api from "../services/api";
 
-// Components (สมมติว่าถูกแปลงเป็น Pure React แล้ว)
 import MenuLogined from "../components/element/MenuLogined";
 import ProfileCard from "./ProfileCard";
-import InsuranceCard, { InsurancePolicy, InsuranceStatus } from "./InsuranceCard"; 
-// import { GlobalStyles } from "./GlobalStyles"; // ลบเนื่องจากจะใช้ CSS/External Script
-
-// ⚠️ สมมติว่า api.js คือ wrapper ของ axios
-const api = axios.create({ baseURL: 'http://localhost:5000' }); 
+// ✅ แก้ไข 1: ใช้ type-only import สำหรับ Type
+import InsuranceCard from "./InsuranceCard";
+import type { InsurancePolicy, InsuranceStatus } from "./InsuranceCard"; 
 
 // ================================================================
-// TYPES (ไม่มีการเปลี่ยนแปลง)
+// TYPES
 // ================================================================
 type DecodedToken = {
     username: string;
@@ -45,8 +39,9 @@ interface IFrontendPurchase {
     citizenCardImage?: string;
     carRegistrationImage?: string;
 }
+
 // ================================================================
-// HELPER FUNCTIONS (ไม่มีการเปลี่ยนแปลง Logic)
+// HELPER FUNCTIONS
 // ================================================================
 
 const checkCookie = (): DecodedToken | null => {
@@ -89,17 +84,14 @@ const mapStatus = (dbStatus: string): InsuranceStatus => {
 // FETCHERS
 // ================================================================
 
-// Fetcher สำหรับ Profile (POST)
 const fetcherProfile = async (url: string) => {
     const userData = checkCookie();
     if (!userData) throw new Error("กรุณาเข้าสู่ระบบ");
     const { username, _id, role } = userData;
-    // ใช้ api (axios wrapper) POST ได้ตามเดิม
     const res = await api.post(url, { username, _id, role });
     return res.data;
 };
 
-// Fetcher ใหม่สำหรับ Insurance (GET)
 const fetcherInsurance = async (url: string) => {
     const res = await api.get(url);
     return res.data;
@@ -110,24 +102,20 @@ const fetcherInsurance = async (url: string) => {
 // ================================================================
 
 export default function ProfilePage() {
-    // แก้ไข: ใช้ useNavigate()
     const navigate = useNavigate();
-    const [userToken, setUserToken] = useState<DecodedToken | null>(null);
 
-    // 1. Check Token เมื่อโหลดหน้า
+    // ✅ แก้ไข 2: ใช้ Lazy Initialization สำหรับ State เพื่อเลี่ยง Error 'set-state-in-effect'
+    const [userToken, setUserToken] = useState<DecodedToken | null>(() => checkCookie());
+
+    // 1. ตรวจสอบ Auth (ถ้าไม่มี Token ให้เด้งออก)
     useEffect(() => {
-        const decoded = checkCookie();
-        if (decoded) {
-            setUserToken(decoded);
-        } else {
-            // แก้ไข: ใช้ navigate() แทน router.push()
+        if (!userToken) {
             navigate("/customer/login"); 
         }
-    }, [navigate]); // เปลี่ยน router เป็น navigate
+    }, [userToken, navigate]);
 
     const logout = () => {
         localStorage.removeItem("token");
-        // แก้ไข: ใช้ navigate()
         navigate("/customer/login");
     };
 
@@ -147,29 +135,24 @@ export default function ProfilePage() {
         fetcherInsurance
     );
 
-    // Loading / Error States for Profile
-    // ถ้าเซสชั่นหมดอายุ navigate ไป login เลย
+    // เซสชั่นหมดอายุ
     if (profileError && !profileLoading) {
-        if (profileError.message !== "กรุณาเข้าสู่ระบบ") { // ป้องกัน loop ถ้า checkCookie ล้มเหลว
-             setTimeout(logout, 100); // ดีเลย์เล็กน้อยเพื่อให้ navigate ทำงาน
+        if (profileError.message !== "กรุณาเข้าสู่ระบบ") {
+             setTimeout(logout, 100);
         }
     }
     
-    if (profileLoading) return <p className="text-center mt-10">กำลังโหลดข้อมูล...</p>;
+    if (profileLoading) return <p className="text-center mt-10 font-bold">กำลังโหลดข้อมูลโปรไฟล์...</p>;
     if (profileError) return <p className="text-center text-red-600 mt-10">เซสชั่นหมดอายุ กรุณาเข้าสู่ระบบใหม่</p>;
 
-
     return (
-        // ลบ <GlobalStyles /> และ <Script> ของ Next.js ออก
-        // ต้องมั่นใจว่า CSS ถูกจัดการโดยไฟล์ CSS ภายนอกแล้ว
-        <main className="font-sans text-gray-800"> 
-            {/* ⚠️ ต้องเพิ่ม Script Tag มาตรฐานสำหรับ Font Awesome ถ้าคุณยังต้องการใช้ */}
-            {/* <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossOrigin="anonymous"></script> */}
+        <main className="font-sans text-gray-800 pb-20"> 
 
             {/* 1. Header */}
-            <MenuLogined activePage="/customer/profile"/>
+            {/* ✅ แก้ไข 4: ลบ activePage ออก เพราะใน MenuLogined.tsx ที่เราแก้ไป มันใช้ useLocation() เช็คเองแล้ว */}
+            <MenuLogined />
 
-            {/* 2. Profile */}
+            {/* 2. Profile Card */}
             <ProfileCard user={profile} />
 
             {/* 3. Insurance Cards Section */}
@@ -178,24 +161,22 @@ export default function ProfilePage() {
                 
                 <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    {/* State: กำลังโหลดประกัน */}
                     {insuranceLoading && (
                         <div className="col-span-2 text-center py-10 text-gray-500">
                             กำลังโหลดข้อมูลกรมธรรม์...
                         </div>
                     )}
 
-                    {/* State: โหลดเสร็จแต่ไม่มีข้อมูล */}
                     {!insuranceLoading && insuranceList && insuranceList.length === 0 && (
                         <div className="col-span-2 text-center py-10 border-2 border-dashed border-gray-300 rounded-lg">
                             <p className="text-gray-500 mb-4">คุณยังไม่มีรายการประกันภัย</p>
-                            <Link to={"/customer/car-insurance/car-Insurance-form"} className="text-blue-500 font-bold w-48 h-12 flex justify-center items-center rounded-full shadow-md hover:bg-blue-500 hover:text-white transition text-lg mx-auto">
+                            {/* ✅ แก้ไข 5: ตอนนี้ Link จะใช้งานได้แล้วเพราะ import มาข้างบน */}
+                            <Link to={"/customer/car-insurance/car-Insurance-form"} className="text-blue-500 font-bold w-48 h-12 flex justify-center items-center rounded-full shadow-md border border-blue-500 hover:bg-blue-500 hover:text-white transition text-lg mx-auto">
                                 คลิกเพื่อสั่งซื้อเลย!
                             </Link>
                         </div>
                     )}
                     
-                    {/* State: มีข้อมูล -> Loop แสดงผล */}
                     {!insuranceLoading && insuranceList && insuranceList.map((item: IFrontendPurchase) => {
                         
                         let displayDate = item.purchase_date;
