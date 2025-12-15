@@ -1,0 +1,26 @@
+npm create vite@latest 1stopinsurance-react -- --template react-ts
+
+cd 1stopinsurance-react
+npm install
+npm install tailwindcss @tailwindcss/vite
+
+//vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite' 
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(), 
+  ],
+})
+
+
+//eslint.config.js
+rules: {
+  // ...กฏอื่นๆ
+  '@typescript-eslint/no-explicit-any': 'off', // <-- สั่งให้หยุดบ่นเรื่อง any
+  '@typescript-eslint/no-unused-vars': 'off',  // <-- แถม: หยุดบ่นเรื่องตัวแปรที่ประกาศแล้วไม่ได้ใช้
+}
