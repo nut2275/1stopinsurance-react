@@ -12,6 +12,7 @@ import ProfilePage from './profile/ProfilePage';
 
 import EditProfileForm from './profile/edit-profile/EditProfileForm'; 
 import MainPageLogged from './mainpage/MainPage';
+import PurchaseDocumentPage from './purchase/PurchaseDocumentPage';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <Route path="/customer/login" element={<LoginForm />} />
       <Route path="/customer/register" element={<RegisterForm />} />
       <Route path="/customer/mainpage" element={<MainPageLogged />} />
+      <Route path="/customer/purchase/:id" element={<PurchaseDocumentPage />} />
     </Routes>
   );
 }

@@ -6,8 +6,6 @@ import Menu from '../element/Menu';
 export default function MainPage() {
   return (
     <div className="flex flex-col min-h-screen font-sans text-gray-800 bg-gray-50">
-
-      {/* Header: ❌ ลบออก เพราะ Layout จะจัดการให้ */}
       <Menu />
 
       {/* Main content */}
