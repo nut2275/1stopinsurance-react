@@ -1,5 +1,4 @@
 // src/components/ProfileCard.tsx
-import React from 'react';
 // แก้ไข: นำเข้า Link จาก react-router-dom
 import { Link } from 'react-router-dom'; 
 // ลบการนำเข้า Next.js Image

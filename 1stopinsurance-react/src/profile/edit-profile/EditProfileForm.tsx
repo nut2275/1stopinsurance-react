@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent, type ChangeEvent } from 'react'; // ✅ แก้ตรงนี้ครับ
+import { useState, type FormEvent, type ChangeEvent } from 'react'; // ✅ แก้ตรงนี้ครับ
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Person, Email, Phone, Home, Cake, CloudUpload, CheckCircle } from '@mui/icons-material';
 import axios from 'axios';

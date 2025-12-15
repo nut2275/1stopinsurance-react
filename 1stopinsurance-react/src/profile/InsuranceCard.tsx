@@ -1,5 +1,4 @@
 // src/components/InsuranceCard.tsx
-import React from 'react';
 // แก้ไข: นำเข้า useNavigate จาก react-router-dom
 import { useNavigate } from "react-router-dom"; 
 // ลบการนำเข้า Next.js Font 
