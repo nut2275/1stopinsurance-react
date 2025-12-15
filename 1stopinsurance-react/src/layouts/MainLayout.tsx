@@ -8,7 +8,7 @@ export default function MainLayout() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* ส่วนหัว (Header) */}
-      <MenuLogined />
+      {/* <MenuLogined /> */}
 
       {/* ส่วนเนื้อหา (Content) จะเปลี่ยนไปเรื่อยๆ ตามหน้าเว็บ */}
       <main className="flex-grow">
