@@ -30,7 +30,7 @@ MONGO_URI=mongodb://127.0.0.1:27017/mydb
 
 Bash
 npm run dev
-2. วิธีรัน Frontend (Folder: 1stopinsurance-react)
+## 2. วิธีรัน Frontend (Folder: 1stopinsurance-react)
 เปิด Terminal ใหม่ แล้วเข้าไปที่โฟลเดอร์ frontend:
 
 Bash
